@@ -14,6 +14,8 @@ fn main() {
     let sys = actix::System::new("rpssl");
     let addr = "127.0.0.1:8088";
 
+    let actor_addr = rpssl::start();
+
     actix_web::server::new(webapp::create_app)
         .bind(addr)
         .unwrap()
