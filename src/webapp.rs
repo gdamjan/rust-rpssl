@@ -1,15 +1,26 @@
+use std::time::{Duration, Instant};
+
 use uuid::Uuid;
 use actix_web::{App, Result, error, HttpRequest, HttpResponse};
 use actix_web::fs::{NamedFile, StaticFiles};
 use actix_web::http::{Method, header, StatusCode};
+use tokio_timer;
+use futures::Future;
 
 use rpssl;
 
 
 // TODO
-fn attack(_req: HttpRequest) -> Result<HttpResponse> {
+fn attack(_req: HttpRequest) -> Box<Future<Item=HttpResponse, Error=error::InternalError<tokio_timer::Error>>> {
     let result = rpssl::demo_draw_result();
-    Ok(HttpResponse::Ok().json(result))
+    let response = Ok(HttpResponse::build(StatusCode::OK).json(result));
+    // Ok(HttpResponse::Ok().json(result))
+    let when = Instant::now() + Duration::new(3, 0);
+    let future = tokio_timer::Delay::new(when)
+        .and_then(|_| response)
+        .map_err(|e| error::InternalError::new(e, StatusCode::INTERNAL_SERVER_ERROR));
+
+    Box::new(future)
 }
 
 fn newgame(req: HttpRequest) -> Result<HttpResponse> {

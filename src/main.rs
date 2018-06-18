@@ -4,6 +4,8 @@ extern crate serde_derive;
 extern crate actix;
 extern crate actix_web;
 extern crate uuid;
+extern crate tokio_timer;
+extern crate futures;
 
 mod webapp;
 mod rpssl;
