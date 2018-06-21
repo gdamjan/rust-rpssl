@@ -14,7 +14,7 @@ use rpssl;
 fn attack(_req: HttpRequest) -> Box<Future<Item=HttpResponse, Error=error::InternalError<tokio_timer::Error>>> {
     let when = Instant::now() + Duration::new(3, 0);
     let future = tokio_timer::Delay::new(when)
-        .and_then(|_| Ok(rpssl::demo_draw_result()))
+        .and_then(|_| Ok(rpssl::demo_draw_result(rpssl::Shape::Spock)))
         .and_then(|result| Ok(HttpResponse::build(StatusCode::OK).json(result)))
         .map_err(|e| error::InternalError::new(e, StatusCode::INTERNAL_SERVER_ERROR));
 

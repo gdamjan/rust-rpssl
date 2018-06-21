@@ -65,11 +65,10 @@ function got_result(data) {
     var results = document.querySelector("ol#results");
     var li = document.createElement("li");
     var span = document.createElement("span");
-    span.textContent = `Outcome: ${data.result} You: ${data.your_attack} They: ${data.their_attack}`;
+    span.textContent = `Outcome: ${data.outcome} You: ${data.your_attack} They: ${data.their_attack}`;
     li.appendChild(span);
     results.appendChild(li);
 }
-
 </script>
 </body>
 </html>

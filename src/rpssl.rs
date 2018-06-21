@@ -1,13 +1,19 @@
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Clone)]
+pub enum Shape { Rock, Paper, Scissors, Spock, Lizard }
+
+#[derive(Serialize)]
+pub enum Outcome { Win, Draw, Loose }
+
+#[derive(Serialize)]
 pub struct GameResult {
     // id: Uuid,
-    result: String,
-    your_attack: String,
-    their_attack: String
+    outcome: Outcome,
+    your_attack: Shape,
+    their_attack: Shape
 }
 
-pub fn demo_draw_result() -> GameResult {
-    GameResult{result: "draw".to_string(), your_attack: "spock".to_string(), their_attack: "spock".to_string()}
+pub fn demo_draw_result(shape: Shape) -> GameResult {
+    GameResult{outcome: Outcome::Draw, your_attack: shape.clone(),  their_attack: shape}
 }
 
 use actix::{Actor, Addr, Context, Handler, Message};
