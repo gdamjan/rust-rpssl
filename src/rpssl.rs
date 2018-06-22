@@ -11,7 +11,6 @@ pub enum Outcome { Win, Draw, Loose }
 
 #[derive(Serialize)]
 pub struct GameResult {
-    // id: Uuid,
     outcome: Outcome,
     your_attack: Shape,
     their_attack: Shape
@@ -36,15 +35,19 @@ impl Actor for GameActor {
     }
 }
 
-impl Message for Shape {
+pub struct Attack {
+    pub attack: Shape,
+}
+
+impl Message for Attack {
     type Result = Result<GameResult, ()>;
 }
 
-impl Handler<Shape> for GameActor {
+impl Handler<Attack> for GameActor {
     type Result = ResponseFuture<GameResult, ()>;
 
-    fn handle(&mut self, msg: Shape, _: &mut Context<Self>) -> Self::Result {
-        let game_outcome : GameResult = demo_draw_result(msg);
+    fn handle(&mut self, msg: Attack, _: &mut Context<Self>) -> Self::Result {
+        let game_outcome : GameResult = demo_draw_result(msg.attack);
 
         let when = Instant::now() + Duration::new(3, 0);
         let fut = tokio_timer::Delay::new(when)

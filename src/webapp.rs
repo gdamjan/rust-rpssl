@@ -12,7 +12,7 @@ type AppState = actix::Addr<rpssl::GameActor>;
 
 // TODO
 fn attack(req: HttpRequest<AppState>) -> Box<Future<Item=HttpResponse, Error=error::Error>> {
-    let this_is_fake = rpssl::Shape::Spock;
+    let this_is_fake = rpssl::Attack{attack:rpssl::Shape::Spock};
     let fut = req.state().send(this_is_fake)
         .map(|response| HttpResponse::build(StatusCode::OK).json(response.unwrap()))
         .map_err(|_| error::ErrorBadRequest("some error"));
