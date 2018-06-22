@@ -1,27 +1,23 @@
-use std::time::{Duration, Instant};
-
 use uuid::Uuid;
 use actix;
 use actix_web::{App, Result, error, HttpRequest, HttpResponse};
 use actix_web::fs::{NamedFile, StaticFiles};
 use actix_web::http::{Method, header, StatusCode};
-use tokio_timer;
 use futures::Future;
 
 use rpssl;
 
-type AppState = actix::Addr<rpssl::MyActor>;
+type AppState = actix::Addr<rpssl::GameActor>;
 
 
 // TODO
-fn attack(_req: HttpRequest<AppState>) -> Box<Future<Item=HttpResponse, Error=error::InternalError<tokio_timer::Error>>> {
-    let when = Instant::now() + Duration::new(3, 0);
-    let future = tokio_timer::Delay::new(when)
-        .and_then(|_| Ok(rpssl::demo_draw_result(rpssl::Shape::Spock)))
-        .and_then(|result| Ok(HttpResponse::build(StatusCode::OK).json(result)))
-        .map_err(|e| error::InternalError::new(e, StatusCode::INTERNAL_SERVER_ERROR));
+fn attack(req: HttpRequest<AppState>) -> Box<Future<Item=HttpResponse, Error=error::Error>> {
+    let this_is_fake = rpssl::Shape::Spock;
+    let fut = req.state().send(this_is_fake)
+        .map(|response| HttpResponse::build(StatusCode::OK).json(response.unwrap()))
+        .map_err(|_| error::ErrorBadRequest("some error"));
 
-    Box::new(future)
+    Box::new(fut)
 }
 
 fn newgame(req: HttpRequest<AppState>) -> Result<HttpResponse> {
