@@ -1,6 +1,7 @@
 use std::time::{Duration, Instant};
 
 use uuid::Uuid;
+use actix;
 use actix_web::{App, Result, error, HttpRequest, HttpResponse};
 use actix_web::fs::{NamedFile, StaticFiles};
 use actix_web::http::{Method, header, StatusCode};
@@ -9,9 +10,11 @@ use futures::Future;
 
 use rpssl;
 
+type AppState = actix::Addr<rpssl::MyActor>;
+
 
 // TODO
-fn attack(_req: HttpRequest) -> Box<Future<Item=HttpResponse, Error=error::InternalError<tokio_timer::Error>>> {
+fn attack(_req: HttpRequest<AppState>) -> Box<Future<Item=HttpResponse, Error=error::InternalError<tokio_timer::Error>>> {
     let when = Instant::now() + Duration::new(3, 0);
     let future = tokio_timer::Delay::new(when)
         .and_then(|_| Ok(rpssl::demo_draw_result(rpssl::Shape::Spock)))
@@ -21,7 +24,7 @@ fn attack(_req: HttpRequest) -> Box<Future<Item=HttpResponse, Error=error::Inter
     Box::new(future)
 }
 
-fn newgame(req: HttpRequest) -> Result<HttpResponse> {
+fn newgame(req: HttpRequest<AppState>) -> Result<HttpResponse> {
     let game_id = Uuid::new_v4().hyphenated().to_string();
     let url = req.url_for("gamepage", &[game_id])?;
     Ok(HttpResponse::Found()
@@ -29,15 +32,15 @@ fn newgame(req: HttpRequest) -> Result<HttpResponse> {
        .finish())
 }
 
-fn mainpage(_req: HttpRequest) -> Result<NamedFile> {
+fn mainpage(_req: HttpRequest<AppState>) -> Result<NamedFile> {
     Ok(NamedFile::open("./static/main.html")?)
 }
-fn gamepage(_req: HttpRequest) -> Result<NamedFile> {
+fn gamepage(_req: HttpRequest<AppState>) -> Result<NamedFile> {
     Ok(NamedFile::open("./static/game.html")?)
 }
 
-pub fn create_app() -> App {
-    App::new()
+pub fn create_app(state: AppState) -> App<AppState> {
+    App::with_state(state)
         .handler("/static", StaticFiles::new("static"))
         .resource("/{id}/attack", |r| r.method(Method::POST).f(attack))
         .resource("/{id}/", |r| { r.name("gamepage"); r.method(Method::GET).f(gamepage) })

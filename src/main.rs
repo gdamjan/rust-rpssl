@@ -16,7 +16,7 @@ fn main() {
 
     let actor_addr = rpssl::start();
 
-    actix_web::server::new(webapp::create_app)
+    actix_web::server::new(move || webapp::create_app(actor_addr.clone()))
         .bind(addr)
         .unwrap()
         .start();
