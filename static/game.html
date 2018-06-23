@@ -15,11 +15,11 @@
  <div id=command_bar style="text-align: center">
   <div id=commands>
   Play:
-  <button onclick="play('rock')" class=play>rock</button>
-  <button onclick="play('paper')" class=play>paper</button>
-  <button onclick="play('scissors')" class=play>scissors</button>
-  <button onclick="play('spock')" class=play>spock</button>
-  <button onclick="play('lizard')" class=play>lizard</button>
+  <button onclick="play('Rock')" class=play>rock</button>
+  <button onclick="play('Paper')" class=play>paper</button>
+  <button onclick="play('Scissors')" class=play>scissors</button>
+  <button onclick="play('Spock')" class=play>spock</button>
+  <button onclick="play('Lizard')" class=play>lizard</button>
   </div>
  </div>
 </div>
@@ -47,11 +47,11 @@ function curtain_off() {
 function play(attack) {
     curtain_on();
 
-    var formData = new FormData();
-    formData.append('attack', attack);
+    var data = {'attack': attack};
     fetch('attack', {
         method: 'POST',
-        body: formData
+        body: JSON.stringify(data),
+        headers:{'Content-Type': 'application/json'}
     })
     .then(response => response.json())
     .then(result => got_result(result))
