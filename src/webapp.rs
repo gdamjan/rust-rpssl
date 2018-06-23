@@ -1,6 +1,6 @@
 use uuid::Uuid;
 use actix;
-use actix_web::{App, Result, error, HttpRequest, HttpResponse};
+use actix_web::{App, Result, error, HttpRequest, HttpResponse, Path, Json};
 use actix_web::fs::{NamedFile, StaticFiles};
 use actix_web::http::{Method, header, StatusCode};
 use futures::Future;
@@ -9,11 +9,13 @@ use rpssl;
 
 type AppState = actix::Addr<rpssl::GameActor>;
 
+#[derive(Deserialize)]
+struct AttackJson { attack: rpssl::Shape }
 
-// TODO
-fn attack(req: HttpRequest<AppState>) -> Box<Future<Item=HttpResponse, Error=error::Error>> {
-    let this_is_fake = rpssl::Attack{id: "demo".to_string(), attack: rpssl::Shape::Spock};
-    let fut = req.state().send(this_is_fake)
+fn attack(data: (HttpRequest<AppState>, Path<String>, Json<AttackJson>)) -> Box<Future<Item=HttpResponse, Error=error::Error>> {
+    let (req, path, val) = data;
+    let msg = rpssl::Attack{id: path.to_string(), attack: val.attack};
+    let fut = req.state().send(msg)
         .map(|response| HttpResponse::build(StatusCode::OK).json(response.unwrap()))
         .map_err(|_| error::ErrorBadRequest("some error"));
 
@@ -38,7 +40,7 @@ fn gamepage(_req: HttpRequest<AppState>) -> Result<NamedFile> {
 pub fn create_app(state: AppState) -> App<AppState> {
     App::with_state(state)
         .handler("/static", StaticFiles::new("static"))
-        .resource("/{id}/attack", |r| r.method(Method::POST).f(attack))
+        .resource("/{id}/attack", |r| r.method(Method::POST).with(attack))
         .resource("/{id}/", |r| { r.name("gamepage"); r.method(Method::GET).f(gamepage) })
         .route("/", Method::POST, newgame)
         .route("/", Method::GET, mainpage)
