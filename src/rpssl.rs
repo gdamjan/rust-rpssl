@@ -58,7 +58,7 @@ impl Actor for GameActor {
 }
 
 pub struct Attack {
-    pub id: String,
+    pub game_id: String,
     pub attack: Shape,
 }
 
@@ -71,17 +71,17 @@ impl Handler<Attack> for GameActor {
 
     fn handle(&mut self, msg: Attack, _: &mut Context<Self>) -> Self::Result {
         let mut games = self.games.lock().unwrap();
-        let fut = if games.contains_key(&msg.id) {
-            let (other_attack, tx) = games.remove(&msg.id).unwrap();
+        let fut = if games.contains_key(&msg.game_id) {
+            let (other_attack, tx) = games.remove(&msg.game_id).unwrap();
             let (res1, res2) = play_rpssl(&msg.attack, &other_attack);
-            tx.send(res2.clone());
+            tx.send(res2);
             // I don't know how to make both of the `if` legs to be compatible, so:
             let (tx, rx) = oneshot::channel();
-            tx.send(res1.clone());
+            tx.send(res1);
             rx
         } else {
             let (tx, rx) = oneshot::channel();
-            games.insert(msg.id, (msg.attack, tx));
+            games.insert(msg.game_id, (msg.attack, tx));
             rx
         };
         Box::new(fut.map(|x| x).map_err(|_| ()))
