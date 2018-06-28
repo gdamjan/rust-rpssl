@@ -14,8 +14,9 @@ struct AttackJson { attack: rpssl::Shape }
 
 fn attack(data: (HttpRequest<AppState>, Path<String>, Json<AttackJson>)) -> Box<Future<Item=HttpResponse, Error=error::Error>> {
     let (req, path, val) = data;
-    let msg = rpssl::Attack{id: path.to_string(), attack: val.attack};
-    let fut = req.state().send(msg)
+    let msg = rpssl::Attack{game_id: path.to_string(), attack: val.attack};
+    let actor = req.state();
+    let fut = actor.send(msg)
         .map(|response| HttpResponse::build(StatusCode::OK).json(response.unwrap()))
         .map_err(|_| error::ErrorBadRequest("some error"));
 
