@@ -1,6 +1,7 @@
 use uuid::Uuid;
 use actix;
 use actix_web::{App, Result, error, HttpRequest, HttpResponse, Path, Json};
+use actix_web::AsyncResponder;
 use actix_web::fs::{NamedFile, StaticFiles};
 use actix_web::http::{Method, header, StatusCode};
 use futures::Future;
@@ -18,9 +19,9 @@ fn attack(data: (HttpRequest<AppState>, Path<String>, Json<AttackJson>)) -> Box<
     let actor = req.state();
     let fut = actor.send(msg)
         .map(|response| HttpResponse::build(StatusCode::OK).json(response.unwrap()))
-        .map_err(|_| error::ErrorBadRequest("some error"));
+        .map_err(|e| error::ErrorInternalServerError(e));
 
-    Box::new(fut)
+    fut.responder()
 }
 
 fn newgame(req: HttpRequest<AppState>) -> Result<HttpResponse> {
