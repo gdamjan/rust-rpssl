@@ -63,11 +63,12 @@ pub struct Attack {
 }
 
 impl Message for Attack {
-    type Result = Result<GameResult, ()>;
-}
-
-impl Handler<Attack> for GameActor {
-    type Result = ResponseFuture<GameResult, ()>;
+    type Result = Result<GameResult, ()>;                 //  <─┐
+}                                                         //    │
+                                                          //    │  these two need to match, and it was not trivial to get them right
+                                                          //    │            (the error messages didn't help much)
+impl Handler<Attack> for GameActor {                      //    │
+    type Result = ResponseFuture<GameResult, ()>;         //  <─┘
 
     fn handle(&mut self, msg: Attack, _: &mut Context<Self>) -> Self::Result {
         let mut games = self.games.lock().unwrap();
