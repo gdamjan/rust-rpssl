@@ -5,6 +5,7 @@ extern crate actix;
 extern crate actix_web;
 extern crate uuid;
 extern crate futures;
+extern crate env_logger;
 
 use std::env;
 
@@ -12,6 +13,7 @@ mod webapp;
 mod rpssl;
 
 fn main() {
+    let _ = env_logger::init();
     let sys = actix::System::new("rpssl");
     let bind_addr = env::var("HTTP_ADDR").unwrap_or("127.0.0.1:8088".to_string());
 
