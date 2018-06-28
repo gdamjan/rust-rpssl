@@ -32,11 +32,18 @@ fn newgame(req: HttpRequest<AppState>) -> Result<HttpResponse> {
        .finish())
 }
 
+
+// this example reads the file in runtime and sends it, can be changed at any time
 fn mainpage(_req: HttpRequest<AppState>) -> Result<NamedFile> {
     Ok(NamedFile::open("./static/main.html")?)
 }
-fn gamepage(_req: HttpRequest<AppState>) -> Result<NamedFile> {
-    Ok(NamedFile::open("./static/game.html")?)
+
+// this on the other hand, reads the file at compile time and embeds it in the executable, can be changed after compile
+fn gamepage(_req: HttpRequest<AppState>) -> HttpResponse {
+    let s = include_str!("../static/game.html");
+    HttpResponse::build(StatusCode::OK)
+        .header(header::CONTENT_TYPE, "text/html")
+        .body(s)
 }
 
 pub fn create_app(state: AppState) -> App<AppState> {
