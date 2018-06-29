@@ -1,3 +1,4 @@
+![rpssl](static/rpssl.png) 
 # rock-paper-scissors-spock-lizard in rust
 
 written in Rust, using [Actix and Actix-Web](https://actix.rs/).
