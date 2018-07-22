@@ -1,6 +1,8 @@
 ![rpssl](static/rpssl.png) 
 # rock-paper-scissors-spock-lizard in rust
 
+[![Build Status](https://travis-ci.org/gdamjan/rpssl-rust.svg?branch=master)](https://travis-ci.org/gdamjan/rpssl-rust)
+
 written in Rust, using [Actix and Actix-Web](https://actix.rs/).
 
 

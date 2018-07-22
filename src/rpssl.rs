@@ -34,7 +34,7 @@ fn play_rpssl(attack1: &Shape, attack2: &Shape) -> (GameResult, GameResult) {
 
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
-use actix::{Actor, Addr, Context, Handler, Message, ResponseFuture};
+use actix_web::actix::{Actor, Addr, Context, Handler, Message, ResponseFuture};
 
 use futures::sync::oneshot::Sender;
 use futures::sync::oneshot;

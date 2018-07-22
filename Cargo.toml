@@ -1,18 +1,15 @@
 [package]
 name = "rpssl"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Дамјан Георгиевски <gdamjan@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/gdamjan/rust-rpssl"
 
 [dependencies]
-actix = "*"
-actix-web = { git = "https://github.com/actix/actix-web.git" }
+actix-web = "0.7"
 uuid = { version = "0.6", features = ["v4"] }
 serde = "1.0"
 serde_derive = "1.0"
 futures = "0.1"
 env_logger = "*"
-
-[patch.crates-io]
-actix = { git = "https://github.com/actix/actix.git" }
